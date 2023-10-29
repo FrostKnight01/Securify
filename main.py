@@ -1,6 +1,7 @@
 import sys
 import pymysql
 import pandas as pd
+import matplotlib.pyplot as plt
 from colorama import Fore, Back, Style, init
 
 
@@ -16,12 +17,29 @@ def encrypt(text, key):
         encrypted_text += chr((ord(char) + key) % 0x110000)
     return encrypted_text
 
-
 def decrypt(encrypted_text, key):
     decrypted_text = ""
     for char in encrypted_text:
         decrypted_text += chr((ord(char) - key) % 0x110000)
     return decrypted_text
+
+def level(Pass):
+    password = Pass
+    level = 0
+    special_characters = "!@#$%^&*()-_=+[]{}|;:'\",.<>/?"
+    if len(password) >= 8:
+        level += 1
+    if any(i.islower() for i in password):
+        level += 1
+    if any(i.isupper() for i in password):
+        level += 1
+    if any(i.isnumeric() for i in password):
+        level += 1
+    if any(i in special_characters for i in password):
+        level += 1
+
+    return level
+
 
 global key
 passwd = input(f"{Style.DIM}enter decryption key:{Style.RESET_ALL} ")
@@ -41,22 +59,24 @@ while True:
     elif command == "help":
         print ("""
 ABOUT
-    Welcome to Secure7, crafted by the trio of Abhishek Agnal, Darshan Bhandari and Punith Nettam. 
+    Welcome to Securify, crafted by the trio of Abhishek Agnal, Darshan Bhandari and Puneeth Nettem. 
     Our passion for security led us to develop this cutting-edge password manager that prioritizes your 
-    data's safety.Secure7 employs a sophisticated encryption system that adapts its decryption technique 
+    data's safety.Securify employs a sophisticated encryption system that adapts its decryption technique 
     according to your user-defined key.This dynamic approach adds an extra layer of protection, 
-    ensuring that your sensitive information remains secure in an ever-evolving digital landscape. 
+    ensuring that your sensitive information remains secure in an ever-evolving digital landscape.
+    What sets Securify apart is its unique ability to support multiple users, providing a tailored and secure 
+    experience for each individual.
     Trust Secure7 to be your guardian in the realm of passwords, where innovation meets security.
 
 COMMANDS       
     key: change the decryption key
          - use this in case your passwords doesn't make any sense
-    new: store a new password
-    pass: retrive password using the unique tag specified while creating a new record
-    show: show all stored usernames
-    delete: delete stored passwords using the unique tag specified while creating a new record
-    strength: bar graph of strength of the passwords stored
-    exit: exit the application
+    new: Create a new record for your password.
+    pass: Retrieve a password using the specified tag.
+    show: Display all stored usernames.
+    delete: Delete a stored password using the specified tag.
+    strength: Assess the strength of stored passwords with a bar graph.
+    exit: Close the Securify application.
         """)
 
 
@@ -66,7 +86,8 @@ COMMANDS
         note = input("Enter note: ")
         tag = input("enter a unique tag to identify your password: ")
         password = encrypt(password_raw, key)
-        db.execute(f"INSERT INTO passwords (username, password, note, tag) VALUES ('{u_name}', '{password}', '{note}', '{tag}');")
+        level = level()
+        db.execute(f"INSERT INTO passwords (username, password, note, tag, level) VALUES ('{u_name}', '{password}', '{note}', '{tag}')")
         connection.commit()
         print ("record added successfully")
         print (f"{Fore.YELLOW}warning{Style.RESET_ALL}: Dont forget the key in use at the time of creating new password")
@@ -117,13 +138,24 @@ COMMANDS
             print (df.to_string(index=False))
 
             df = pd.DataFrame(data)
-
         else:
             print ("no records found")
 
     elif command == "strength":
-        print ("Hey, password pioneers! Our coding maestros are crafting a wizardly update—soon, your passwords will reveal their strength secrets. Prepare for the magic, unfolding soon on our GitHub stage")
+        check = db.execute(f"SELECT username,level FROM passwords")
+        output = db.fetchall()
+        categories = []
+        values = []
+        for i in range(0, check):
+            categories.append(output[i][0])
+            values.append(output[i][1])
 
+        plt.bar(categories, values, color='blue')
+
+        plt.xlabel('Categories')
+        plt.ylabel('Values')
+        plt.title('strength')
+        plt.show()
     elif command == "":
         continue
     else:
