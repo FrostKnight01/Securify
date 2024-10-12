@@ -26,6 +26,7 @@ Securify employs a sophisticated encryption system that adapts its decryption te
 ## Contact
 
 Feel free to reach out on Instagram:
-- [__frostknight__](https://www.instagram.com/__frostknight__/) (Me)
-- [drash_175](https://www.instagram.com/drash_175/) (Darshan Bhandari)
+- [@abhishekagnal](https://www.instagram.com/abhishekagnal/) (Me)
+- [@drashan_b175](https://www.instagram.com/darshan_b175/) (Darshan Bhandari)
+- [@puneethnettem](https://www.instagram.com/puneethnettem/) (Puneeth Nettem)
 
